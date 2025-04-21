@@ -7,8 +7,39 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Welcome to KetoSimu!</h1>
-    <p>Select your food and track your macros!</p>
+    <h1>KetoSimu - Track Your Macros</h1>
+    <div class="meal-selector">
+        <label for="meal">Choose your meal:</label>
+        <select id="meal">
+            <option value="kahvalti">Kahvaltı</option>
+            <option value="ogle">Öğle</option>
+            <option value="aksam">Akşam</option>
+        </select>
+    </div>
+    <div class="food-selection">
+        <label for="food">Select food:</label>
+        <select id="food">
+            <option value="Feast İnce Patates">Feast İnce Patates</option>
+            <option value="Yumurta">Yumurta</option>
+            <option value="Zeytin Ezmesi">Zeytin Ezmesi</option>
+            <option value="Kıyma">Kıyma</option>
+            <option value="Hindistan Cevizi Yağı">Hindistan Cevizi Yağı</option>
+        </select>
+    </div>
+    <div class="quantity">
+        <label for="quantity">Quantity (g):</label>
+        <input type="number" id="quantity" min="1" value="100">
+    </div>
+    <div class="output">
+        <p>Total Calories: <span id="total-calories">0</span> kcal</p>
+        <p>Total Protein: <span id="total-protein">0</span> g</p>
+        <p>Total Carbs: <span id="total-carbs">0</span> g</p>
+        <p>Total Fat: <span id="total-fat">0</span> g</p>
+    </div>
+    <div class="progress-bar">
+        <p>Progress:</p>
+        <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
