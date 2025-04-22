@@ -1,38 +1,77 @@
-// Yiyecek verileri (kalori, karbonhidrat, protein, yağ)
-const foodData = {
-    "Feast İnce Patates": { calories: 137, carbs: 22.0, protein: 2.0, fat: 4.5 },
-    "Yumurta": { calories: 608, carbs: 5.2, protein: 31.98, fat: 51.7 },
-    "Zeytin Ezmesi": { calories: 204, carbs: 0.6, protein: 0.6, fat: 21.0 },
-    "Kıyma": { calories: 398, carbs: 1.36, protein: 55.22, fat: 24.44 },
-    "Hindistan Cevizi Yağı": { calories: 178, carbs: 0.0, protein: 0.0, fat: 20.0 }
-};
+const foods = [
+  { name: "Yumurta", unit: "adet", calPerUnit: 72, carbPerUnit: 0.4, proteinPerUnit: 6, fatPerUnit: 5 },
+  { name: "Badem", unit: "gram", calPerUnit: 5.7, carbPerUnit: 0.2, proteinPerUnit: 0.2, fatPerUnit: 0.5 },
+  { name: "Zeytin", unit: "adet", calPerUnit: 5, carbPerUnit: 0.1, proteinPerUnit: 0.03, fatPerUnit: 0.4 },
+  { name: "Avokado", unit: "gram", calPerUnit: 1.6, carbPerUnit: 0.08, proteinPerUnit: 0.02, fatPerUnit: 0.15 },
+  { name: "Hindi Göğüs", unit: "gram", calPerUnit: 1.35, carbPerUnit: 0, proteinPerUnit: 0.29, fatPerUnit: 0.03 },
+  { name: "Brokoli", unit: "gram", calPerUnit: 0.34, carbPerUnit: 0.07, proteinPerUnit: 0.03, fatPerUnit: 0.003 },
+];
 
-// Kullanıcı seçimlerini dinleyip hesaplamaları güncelleme
-function updateTotals() {
-    const selectedFood = document.getElementById('food').value;
-    const quantity = document.getElementById('quantity').value;
-    const foodInfo = foodData[selectedFood];
+function startMeals() {
+  document.getElementById("targetSection").classList.add("hidden");
+  document.getElementById("mealSection").classList.remove("hidden");
 
-    const calories = (foodInfo.calories * quantity) / 100;
-    const protein = (foodInfo.protein * quantity) / 100;
-    const carbs = (foodInfo.carbs * quantity) / 100;
-    const fat = (foodInfo.fat * quantity) / 100;
+  const meals = ["Kahvaltı", "Öğle", "Akşam", "Ara Öğün"];
+  const container = document.getElementById("mealsContainer");
+  meals.forEach(meal => {
+    const mealDiv = document.createElement("div");
+    mealDiv.innerHTML = `<h3 class="text-xl font-bold text-blue-700 mb-2">${meal}</h3>`;
 
-    // Kalori, protein, karbonhidrat ve yağ hesaplama
-    document.getElementById('total-calories').textContent = calories.toFixed(2);
-    document.getElementById('total-protein').textContent = protein.toFixed(2);
-    document.getElementById('total-carbs').textContent = carbs.toFixed(2);
-    document.getElementById('total-fat').textContent = fat.toFixed(2);
+    for (let i = 0; i < 6; i++) {
+      mealDiv.innerHTML += `
+        <div class="flex space-x-2 mb-2">
+          <select class="flex-1 p-2 border rounded" data-meal="${meal}">
+            <option value="">Yiyecek Seç</option>
+            ${foods.map(f => `<option value="${f.name}">${f.name}</option>`).join("")}
+          </select>
+          <input type="number" placeholder="Miktar" class="w-24 p-2 border rounded" data-meal="${meal}">
+        </div>
+      `;
+    }
 
-    // Günlük kalori hedefi ve progress bar
-    const dailyGoal = 1600; // Örnek günlük hedef
-    const progress = (calories / dailyGoal) * 100;
-    document.getElementById('progress-bar').value = progress;
+    container.appendChild(mealDiv);
+  });
 }
 
-// Etkinlikleri dinleme
-document.getElementById('food').addEventListener('change', updateTotals);
-document.getElementById('quantity').addEventListener('input', updateTotals);
+function calculateResults() {
+  let totalCalories = 0, totalCarbs = 0, totalProtein = 0, totalFat = 0;
 
-// İlk hesaplamayı başlat
-updateTotals();
+  document.querySelectorAll('#mealsContainer select').forEach((select, index) => {
+    const input = document.querySelectorAll('#mealsContainer input')[index];
+    const selectedFood = foods.find(f => f.name === select.value);
+    if (selectedFood && input.value) {
+      const qty = parseFloat(input.value);
+      totalCalories += selectedFood.calPerUnit * qty;
+      totalCarbs += selectedFood.carbPerUnit * qty;
+      totalProtein += selectedFood.proteinPerUnit * qty;
+      totalFat += selectedFood.fatPerUnit * qty;
+    }
+  });
+
+  document.getElementById("mealSection").classList.add("hidden");
+  document.getElementById("resultSection").classList.remove("hidden");
+
+  document.getElementById("totalCalories").innerText = `Toplam Kalori: ${totalCalories.toFixed(0)} kcal`;
+  document.getElementById("totalCarbs").innerText = `Toplam Karbonhidrat: ${totalCarbs.toFixed(1)} gr`;
+  document.getElementById("totalProtein").innerText = `Toplam Protein: ${totalProtein.toFixed(1)} gr`;
+  document.getElementById("totalFat").innerText = `Toplam Yağ: ${totalFat.toFixed(1)} gr`;
+
+  new Chart(document.getElementById("macroChart"), {
+    type: "pie",
+    data: {
+      labels: ["Karbonhidrat", "Protein", "Yağ"],
+      datasets: [{
+        data: [
+          totalCarbs * 4,
+          totalProtein * 4,
+          totalFat * 9
+        ],
+        backgroundColor: ["#60A5FA", "#34D399", "#FBBF24"]
+      }]
+    }
+  });
+}
+
+function restart() {
+  window.location.reload();
+}
